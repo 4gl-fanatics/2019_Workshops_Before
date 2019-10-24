@@ -58,8 +58,8 @@ define output parameter pContinue as logical no-undo initial false.
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS fi-date-from Btn_OK fi-date-to Btn_Cancel ~
-fi-custnum-from Btn_Help fi-custnum-to fi-output-file btn-lookup-file 
+&Scoped-Define ENABLED-OBJECTS fi-date-from fi-date-to fi-custnum-from ~
+fi-custnum-to fi-output-file btn-lookup-file Btn_OK Btn_Cancel Btn_Help 
 &Scoped-Define DISPLAYED-OBJECTS fi-date-from fi-date-to fi-custnum-from ~
 fi-custnum-to fi-output-file 
 
@@ -126,15 +126,15 @@ DEFINE VARIABLE fi-output-file AS CHARACTER FORMAT "X(256)":U INITIAL "report.pd
 
 DEFINE FRAME Dialog-Frame
      fi-date-from AT ROW 1.95 COL 25 COLON-ALIGNED WIDGET-ID 2
-     Btn_OK AT ROW 1.95 COL 71
      fi-date-to AT ROW 3.14 COL 25 COLON-ALIGNED WIDGET-ID 4
-     Btn_Cancel AT ROW 3.19 COL 71
      fi-custnum-from AT ROW 4.81 COL 25 COLON-ALIGNED WIDGET-ID 6
-     Btn_Help AT ROW 5.19 COL 71
      fi-custnum-to AT ROW 6 COL 25 COLON-ALIGNED WIDGET-ID 8
      fi-output-file AT ROW 7.67 COL 25 COLON-ALIGNED WIDGET-ID 12
      btn-lookup-file AT ROW 7.67 COL 66 WIDGET-ID 14
-     SPACE(18.19) SKIP(0.46)
+     Btn_OK AT ROW 1.95 COL 71
+     Btn_Cancel AT ROW 3.19 COL 71
+     Btn_Help AT ROW 5.19 COL 71
+     SPACE(2.19) SKIP(2.80)
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D  SCROLLABLE 
          TITLE "Customer Report Parameters"
@@ -157,7 +157,7 @@ DEFINE FRAME Dialog-Frame
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
-   FRAME-NAME                                                           */
+   FRAME-NAME L-To-R,COLUMNS                                            */
 ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
@@ -239,9 +239,8 @@ END.
 fi-custnum-from:screen-value = string(pCustFrom).
 fi-custnum-to:screen-value = string(pCustTo). 
 fi-date-from:screen-value = string(pDateFrom).
-fi-date-to:screen-value = string(pDateTo). 
+fi-date-to:screen-value = string(pDateTo).
 fi-output-file:screen-value = pOutputFile.
-
 
 /* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
 IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ?
@@ -254,6 +253,7 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
   RUN enable_UI.
+  run set-widget-properties.
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
 END.
 RUN disable_UI.
@@ -281,6 +281,27 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE set-widget-properties Dialog-Frame
+procedure set-widget-properties:
+/*------------------------------------------------------------------------------
+ Purpose:
+ Notes:
+------------------------------------------------------------------------------*/
+do with frame {&FRAME-NAME}:
+    fi-date-from:hidden = (pDateFrom eq ?).
+    fi-date-to:hidden = (pDateTo eq ?).
+    
+    fi-custnum-from:hidden = (pCustFrom eq ?).
+    fi-custnum-to:hidden = (pCustTo eq ?).
+end.
+end procedure.
+    
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI Dialog-Frame  _DEFAULT-ENABLE
 PROCEDURE enable_UI :
 /*------------------------------------------------------------------------------
@@ -294,8 +315,8 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY fi-date-from fi-date-to fi-custnum-from fi-custnum-to fi-output-file 
       WITH FRAME Dialog-Frame.
-  ENABLE fi-date-from Btn_OK fi-date-to Btn_Cancel fi-custnum-from Btn_Help 
-         fi-custnum-to fi-output-file btn-lookup-file 
+  ENABLE fi-date-from fi-date-to fi-custnum-from fi-custnum-to fi-output-file 
+         btn-lookup-file Btn_OK Btn_Cancel Btn_Help 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}

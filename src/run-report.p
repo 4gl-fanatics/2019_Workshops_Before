@@ -35,6 +35,8 @@ DEFINE VARIABLE lContinue     AS LOGICAL   NO-UNDO.
 
 ASSIGN dtDateFrom   = DATE (1, 1, YEAR (TODAY))
        dtDateTo     = DATE (12, 31, YEAR (TODAY))
+       //dtDateTo     = ? // uncomment to see hidden field
+       //iCustomerTo  = ? // uncomment to see hidden field
        cOutputFile  = "report.pdf" .
 
 RUN d-customerreport-parameter.w (INPUT-OUTPUT iCustomerFrom, 
