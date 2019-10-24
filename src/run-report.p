@@ -28,8 +28,7 @@ DEFINE VARIABLE iCustomerTo   AS INTEGER   NO-UNDO.
 DEFINE VARIABLE dtDateFrom    AS DATE      NO-UNDO.
 DEFINE VARIABLE dtDateTo      AS DATE      NO-UNDO.
 DEFINE VARIABLE cOutputFile   AS CHARACTER NO-UNDO.
-
-DEFINE VARIABLE lContinue     AS LOGICAL   NO-UNDO.
+DEFINE VARIABLE cContinue     AS CHARACTER NO-UNDO.
 
 /* ***************************  Main Block  *************************** */
 
@@ -44,13 +43,10 @@ RUN d-customerreport-parameter.w (INPUT-OUTPUT iCustomerFrom,
                                  INPUT-OUTPUT dtDateFrom,
                                  INPUT-OUTPUT dtDateTo,
                                  INPUT-OUTPUT cOutputFile,
-                                 OUTPUT lContinue) . 
-IF NOT lContinue THEN  
-    RETURN .
-
-RUN print-report.p (INPUT iCustomerFrom, 
-                    INPUT iCustomerTo,
-                    INPUT dtDateFrom,
-                    INPUT dtDateTo,
-                    INPUT cOutputFile).
-
+                                 OUTPUT cContinue) . 
+IF cContinue = "OK" THEN  
+    RUN print-report.p (INPUT iCustomerFrom, 
+                        INPUT iCustomerTo,
+                        INPUT dtDateFrom,
+                        INPUT dtDateTo,
+                        INPUT cOutputFile).

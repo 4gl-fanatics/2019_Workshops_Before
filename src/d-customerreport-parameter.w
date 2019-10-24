@@ -38,7 +38,7 @@ define input-output parameter pCustTo as integer no-undo.
 define input-output parameter pDateFrom as date no-undo.
 define input-output parameter pDateTo as date no-undo.
 define input-output parameter pOutputFile as character no-undo.
-define output parameter pContinue as logical no-undo initial false.
+define output parameter pContinue as character no-undo initial "CANCEL".
 
 
 /* Local Variable Definitions ---                                       */
@@ -187,7 +187,7 @@ END.
 ON CHOOSE OF btn-lookup-file IN FRAME Dialog-Frame /* ... */
 DO:
     system-dialog get-file pOutputFile
-        title   "Select a report file ..."
+        title   "Select a report output file ..."
         filters "Report Files (*.pdf)"   "*.pdf"
         use-filename
         .
@@ -196,6 +196,18 @@ END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME Btn_Cancel
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_Cancel Dialog-Frame
+ON CHOOSE OF Btn_Cancel IN FRAME Dialog-Frame /* Cancel */
+DO:
+    pContinue = "CANCEL".  
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 
 
 &Scoped-define SELF-NAME Btn_Help
@@ -216,7 +228,7 @@ ON CHOOSE OF Btn_OK IN FRAME Dialog-Frame /* OK */
 DO:
     run validate-inputs.
     
-    if not pContinue then
+    if not pContinue = "OK" then
     do:
         message 
         'Validation failure: ' return-value
@@ -281,27 +293,6 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE set-widget-properties Dialog-Frame
-procedure set-widget-properties:
-/*------------------------------------------------------------------------------
- Purpose:
- Notes:
-------------------------------------------------------------------------------*/
-do with frame {&FRAME-NAME}:
-    fi-date-from:hidden = (pDateFrom eq ?).
-    fi-date-to:hidden = (pDateTo eq ?).
-    
-    fi-custnum-from:hidden = (pCustFrom eq ?).
-    fi-custnum-to:hidden = (pCustTo eq ?).
-end.
-end procedure.
-    
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI Dialog-Frame  _DEFAULT-ENABLE
 PROCEDURE enable_UI :
 /*------------------------------------------------------------------------------
@@ -325,6 +316,24 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE set-widget-properties Dialog-Frame 
+PROCEDURE set-widget-properties :
+/*------------------------------------------------------------------------------
+ Purpose:
+ Notes:
+------------------------------------------------------------------------------*/
+do with frame {&FRAME-NAME}:
+    fi-date-from:hidden = (pDateFrom eq ?).
+    fi-date-to:hidden = (pDateTo eq ?).
+    
+    fi-custnum-from:hidden = (pCustFrom eq ?).
+    fi-custnum-to:hidden = (pCustTo eq ?).
+end.
+end procedure.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE validate-inputs Dialog-Frame 
 PROCEDURE validate-inputs :
 /*------------------------------------------------------------------------------
@@ -338,7 +347,7 @@ do with frame {&FRAME-NAME}:
             and fi-date-from:input-value gt fi-date-to:input-value ) 
     then
     do:
-        pContinue = no.
+        pContinue = "CANCEL".
         return 'Bad date range'.
     end.
     
@@ -346,13 +355,13 @@ do with frame {&FRAME-NAME}:
        or fi-custnum-to:input-value eq ?
     then
     do:
-        pContinue = no.
+        pContinue = "CANCEL".
         return 'Invalid customer specified'.
     end.
     
     if fi-custnum-from:input-value gt fi-custnum-to:input-value then
     do:
-        pContinue = no.
+        pContinue = "CANCEL".
         return 'Bad customer range'.
     end.
     
@@ -360,11 +369,11 @@ do with frame {&FRAME-NAME}:
        or fi-output-file:input-value eq ''
     then
     do:
-        pContinue = no.
+        pContinue = "CANCEL".
         return 'No output file specified'.
     end.
     
-    pContinue = yes.
+    pContinue = "OK".
 end.
 end procedure.
 
