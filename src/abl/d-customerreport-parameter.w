@@ -209,7 +209,6 @@ END.
 &ANALYZE-RESUME
 
 
-
 &Scoped-define SELF-NAME Btn_Help
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_Help Dialog-Frame
 ON CHOOSE OF Btn_Help IN FRAME Dialog-Frame /* Help */
@@ -323,11 +322,17 @@ PROCEDURE set-widget-properties :
  Notes:
 ------------------------------------------------------------------------------*/
 do with frame {&FRAME-NAME}:
-    fi-date-from:hidden = (pDateFrom eq ?).
-    fi-date-to:hidden = (pDateTo eq ?).
+    if pDateFrom eq ? then
+        disable fi-date-from.
     
-    fi-custnum-from:hidden = (pCustFrom eq ?).
-    fi-custnum-to:hidden = (pCustTo eq ?).
+    if pDateTo eq ? then
+        disable fi-date-to.
+    
+    if pCustFrom eq ? then
+        disable fi-custnum-from.
+            
+    if pCustTo eq ? then
+        disable fi-custnum-to.
 end.
 end procedure.
 

@@ -7,13 +7,8 @@ binary, for any purpose, commercial or non-commercial, and by any
 means.
 */ 
 /*------------------------------------------------------------------------
-    File        : old-style.p
-    Purpose     : 
-
-    Syntax      :
-
-    Description : 
-
+    File        : run-report.p
+    Description : Runs the ABL UI dialog to capture report parameters
     Author(s)   : Mike Fechner / Consultingwerk Ltd.
     Created     : Sun Oct 06 14:22:04 CEST 2019 
     Notes       :
@@ -34,11 +29,11 @@ DEFINE VARIABLE cContinue     AS CHARACTER NO-UNDO.
 
 ASSIGN dtDateFrom   = DATE (1, 1, YEAR (TODAY))
        dtDateTo     = DATE (12, 31, YEAR (TODAY))
-       //dtDateTo     = ? // uncomment to see hidden field
-       //iCustomerTo  = ? // uncomment to see hidden field
+       //dtDateTo     = ? // uncomment to disable field
+       //iCustomerTo  = ? // uncomment to disable field
        cOutputFile  = "report.pdf" .
 
-RUN d-customerreport-parameter.w (INPUT-OUTPUT iCustomerFrom, 
+RUN abl/d-customerreport-parameter.w (INPUT-OUTPUT iCustomerFrom, 
                                  INPUT-OUTPUT iCustomerTo,
                                  INPUT-OUTPUT dtDateFrom,
                                  INPUT-OUTPUT dtDateTo,
